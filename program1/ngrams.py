@@ -27,16 +27,17 @@ def compute_ngram_charfreq(invertedIndex, charFreq, n, text):
 
 
 #compute_char_freq(char_freq, word) calculates the character frequency 
+#char_freq is the character frequency array
 def compute_char_freq(char_freq, token):
 	for i in token:
 		char_freq[rank(i)] += 1
 
-#calculates position of character c in charFreq array
+#rank(char) calculates position of character c in charFreq array
 #rank('a') = 0
 def rank(char):
 	return ord(char) - 97
 
-#returns list of words from file called filename
+#give_word_list(filename) returns list of words from file called filename
 def give_word_list(filename):
     f = open(filename, 'r')
     words = []
@@ -45,22 +46,27 @@ def give_word_list(filename):
             words.extend(token.split('-'))
     return words
 
+#give_file_path(filename) returns the list of paths
+#stored in the file called filename
 def give_file_path(filename):
     f = open(filename, 'r')
     words = [token for line in f for token in line.split()]
     return words
 
-#tokenizes a word
+#tokenize(word) returns the tokenized string named word
 def tokenize(word):
     regex = re.compile('[^a-zA-Z]+')
     w = regex.sub('', word)
     w = w.lower()
     return w
 
-#tokenizes a list of words
+#tokenize_word_list(wordlist) returns a tokenizes a list of words
+#wordlist is the list of words to tokenize
 def tokenize_word_list(wordlist):
     i = 0
     while i < len(wordlist):
+    	#prevents adding empty string to wordlist if string only
+    	#contains usless characters
         temp = tokenize(wordlist[i])
         if temp != '':
             wordlist[i] = tokenize(wordlist[i])
@@ -69,7 +75,8 @@ def tokenize_word_list(wordlist):
             del wordlist[i]
     return wordlist
 
-#writes the charater frequency to an output file
+#write_char_freq(charFreq) writes the character frequency charFreq
+#to an output file named 'charfreq.txt'
 def write_char_freq(charFreq):
     outf = open('charfreq.txt', 'w')
     i = 0
@@ -78,8 +85,10 @@ def write_char_freq(charFreq):
         i += 1
     outf.close()
 
-#read in all the files in a loop
-def processCorpus(inputList, charFreq, invertedIndex):
+#processCorpus(inputList, charFreq, invertedIndex) process all files in inputList
+#each file is tokenized. The charFreq array and invertedIndex are updated according
+#to the contents of the file.
+def processCorpus(inputList, charFreq, invertedIndex, n):
     i = 0
     while i < len(inputList):
         text = give_word_list(inputList[i])
@@ -88,13 +97,23 @@ def processCorpus(inputList, charFreq, invertedIndex):
 	compute_ngram_charfreq(invertedIndex, charFreq, n, text)
 	i +=  1
 
+#printSortedIndex(sortedIndex) prints the first k entrys of the
+#sorted index. sortedIndex is the sorted list of tuples 
+#to be printed.
+def printSortedIndex(sortedIndex, k):
+	j = 0
+	while j < k and j < len(sortedIndex):
+		print sortedIndex[j]
+		j += 1
+
+
 
 #####Main######
 
 
 invertedIndex = {}
 
-#charater frequenct array
+#charFreq hold the frequency count of characters a-z
 #charFreq[0] represents the character a
 #charFreq[1] represents the character b
 #....
@@ -105,31 +124,15 @@ charFreq = [0] * 26
 n = 2
 
 inputFiles = give_file_path('input-files.txt')
-processCorpus(inputFiles, charFreq, invertedIndex)
+processCorpus(inputFiles, charFreq, invertedIndex, n)
 
 print charFreq
 
-'''
-#test!!!!!!!!!!!!!!!
-test = give_word_list("test.txt")
-print test
-test = tokenize_word_list(test)
-print test
-compute_ngram_charfreq(invertedIndex, charFreq, n, test)
-#test
-'''
-
-
-
+#convert invertedIndex to list of tuples to be sorted
 IItuples = [(value, key) for key, value in invertedIndex.iteritems()]
-SortedTuples = sorted(IItuples, key=lambda x: x[0], reverse=True)
+sortedTuples = sorted(IItuples, key=lambda x: x[0], reverse=True)
 
-#print IItuples
-#print SortedTuples
-
-j = 0
-while j < 10:
-	print SortedTuples[j]
-	j += 1
+#print top ten most frequently occuring ngrams
+printSortedIndex(sortedTuples, 10)
 
 write_char_freq(charFreq)
