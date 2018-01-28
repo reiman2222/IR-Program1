@@ -1,5 +1,5 @@
 import re
-
+import csv
 
 #compute_ngram_charfreq(invertedIndex, charFile, n, text) computes the frequency
 #of each word in the given file.
@@ -106,6 +106,13 @@ def printSortedIndex(sortedIndex, k):
 		print sortedIndex[j]
 		j += 1
 
+#dictonary_to_csv(invertedIndex, filename) writes dictonary named invertedIndex
+#to csv file named filename
+def dictonary_to_csv(invertedIndex, filename):
+	with open(filename, 'w') as f:  # Just use 'w' mode in 3.x
+		w = csv.DictWriter(f, invertedIndex.keys())
+   		w.writeheader()
+   		w.writerow(invertedIndex)
 
 
 #####Main######
@@ -121,7 +128,7 @@ invertedIndex = {}
 charFreq = [0] * 26
 
 #n is the size of the n-gram 
-n = 2
+n = 1
 
 inputFiles = give_file_path('input-files.txt')
 processCorpus(inputFiles, charFreq, invertedIndex, n)
@@ -136,3 +143,6 @@ sortedTuples = sorted(IItuples, key=lambda x: x[0], reverse=True)
 printSortedIndex(sortedTuples, 10)
 
 write_char_freq(charFreq)
+
+dictonary_to_csv(invertedIndex, 'unigrams.csv')
+print 'DONE'
