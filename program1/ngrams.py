@@ -114,6 +114,13 @@ def dictonary_to_csv(invertedIndex, filename):
    		w.writeheader()
    		w.writerow(invertedIndex)
 
+#list_to_file(filename, invertedIndex) writes the list invertedIndex
+#to file called filename
+def list_to_file(filename, invertedIndex):
+	f = open(filename, 'w')
+	
+	for item in invertedIndex:
+  		f.write("%s\n" % item)
 
 #####Main######
 
@@ -131,18 +138,34 @@ charFreq = [0] * 26
 n = 1
 
 inputFiles = give_file_path('input-files.txt')
-processCorpus(inputFiles, charFreq, invertedIndex, n)
 
-print charFreq
+outputFileNames = ['unigram.txt', 'bigram.txt', 'trigram.txt']
+
+i = 1
+
+#process corpus for unigrams, bigrams and trigrams
+while i <= 3:
+	charFreq = [0] * 26
+	invertedIndex = {}
+	
+	processCorpus(inputFiles, charFreq, invertedIndex, i)
+	
+	sortedNgramList = sorted(invertedIndex)
+	list_to_file(outputFileNames[i - 1], sortedNgramList)
+
+	i += 1
+
+
+
+#print charFreq
 
 #convert invertedIndex to list of tuples to be sorted
-IItuples = [(value, key) for key, value in invertedIndex.iteritems()]
-sortedTuples = sorted(IItuples, key=lambda x: x[0], reverse=True)
+#IItuples = [(value, key) for key, value in invertedIndex.iteritems()]
+#sortedTuples = sorted(IItuples, key=lambda x: x[0], reverse=True)
 
 #print top ten most frequently occuring ngrams
-printSortedIndex(sortedTuples, 10)
+#printSortedIndex(sortedTuples, 10)
 
 write_char_freq(charFreq)
 
-dictonary_to_csv(invertedIndex, 'unigrams.csv')
-print 'DONE'
+#dictonary_to_csv(invertedIndex, 'unigrams.csv')
